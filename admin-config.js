@@ -17,6 +17,11 @@
         (or use tools/hash-generator.html — it now defaults to 600,000 too)
      3. Paste the three values below (salt, iterations, hash) and commit.
      NEVER store the plain passphrase here.
+     NOTE — salt convention: the hash is derived with the salt passed as a
+     UTF-8 STRING (the raw hex characters), i.e. pbkdf2Sync(pass, s, ...) with
+     s a string — NOT hex-decoded bytes. The login gate (admin.js), the
+     change-passphrase flow, hash-generator.html and the Worker all use this
+     same convention; keep it when regenerating.
 
    WHY PBKDF2: Web Crypto API (window.crypto.subtle) implements PBKDF2 in
    every modern browser, so the login gate can verify the passphrase with
@@ -34,9 +39,9 @@
 
 window.DD_ADMIN_CFG = {
   /* PBKDF2-SHA256 verifier (hex). Change these three values together. */
-  salt: "c3cc35771388b9efd1649368e1308776",
+  salt: "cc254f21ae9072352fc0881c1877176f",
   iterations: 600000,
-  hash: "677691aff95644b024fcbcb55e8c6cc4c1fceb4b56dddbb6d4bd9fbdcbad5735",
+  hash: "6afb198d8d0916bfa81505a1aa13cb68a379644da372ec563790c281566b3faf",
 
   /* Session token lives in sessionStorage under this key (cleared when the
      tab closes — never localStorage, so it cannot persist after logout). */

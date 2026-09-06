@@ -109,7 +109,11 @@
     statusEl.textContent = "Deriving PBKDF2-SHA256 (" + ITER.toLocaleString() + " iterations)…";
     try {
       var saltHex = randomHex(16);
-      var saltBytes = new Uint8Array(saltHex.match(/.{2}/g).map(function (h) { return parseInt(h, 16); }));
+      /* IMPORTANT: the login gate (admin.js) and the Worker both derive the
+         verifier with the salt encoded as UTF-8 TEXT of the hex string (not
+         hex-decoded bytes) — that is how the current admin-config.js hash was
+         generated. Keep generation identical so a fresh hash always verifies. */
+      var saltBytes = enc.encode(saltHex);
       var keyMaterial = await crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveBits"]);
       var bits = await crypto.subtle.deriveBits(
         { name: "PBKDF2", salt: saltBytes, iterations: ITER, hash: "SHA-256" },

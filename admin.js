@@ -77,7 +77,11 @@
   /* ---------- PBKDF2 via Web Crypto (local-mode gate) ---------- */
   function pbkdf2(pass, saltHex, iterations) {
     var enc = new TextEncoder();
-    var saltBytes = new Uint8Array(saltHex.match(/.{2}/g).map(function (b) { return parseInt(b, 16); }));
+    /* The salt in admin-config.js is stored as a hex STRING, and the stored
+       hash was derived with the salt encoded as UTF-8 text (the raw hex
+       characters), NOT hex-decoded bytes — so we feed TextEncoder bytes of
+       the hex string, matching how the verifier was generated. */
+    var saltBytes = enc.encode(saltHex);
     return crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveBits"])
       .then(function (key) {
         return crypto.subtle.deriveBits({ name: "PBKDF2", salt: saltBytes, iterations: iterations, hash: "SHA-256" }, key, 256);
@@ -534,7 +538,10 @@
         var saltHex = Array.prototype.map.call(saltBytes, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
         return crypto.subtle.importKey("raw", new TextEncoder().encode(n1.value), "PBKDF2", false, ["deriveBits"])
           .then(function (key) {
-            return crypto.subtle.deriveBits({ name: "PBKDF2", salt: saltBytes, iterations: 600000, hash: "SHA-256" }, key, 256);
+            /* Derive with the salt as UTF-8 text of the hex string — matches
+               pbkdf2() above and the Worker, so a freshly generated block
+               verifies on the next login. */
+            return crypto.subtle.deriveBits({ name: "PBKDF2", salt: new TextEncoder().encode(saltHex), iterations: 600000, hash: "SHA-256" }, key, 256);
           })
           .then(function (bits) {
             var hx = Array.prototype.map.call(new Uint8Array(bits), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");

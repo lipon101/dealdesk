@@ -121,8 +121,11 @@ async function pbkdf2Hex(pass, saltHex, iterations) {
   const material = await crypto.subtle.importKey(
     "raw", new TextEncoder().encode(pass), "PBKDF2", false, ["deriveBits"]
   );
+  /* Salt is stored as a hex STRING in admin-config.js / ADMIN_SALT; the
+     verifier hash was derived with the salt encoded as UTF-8 text (the raw
+     hex characters), NOT hex-decoded bytes — keep both sides consistent. */
   const bits = await crypto.subtle.deriveBits(
-    { name: "PBKDF2", salt: hexToBytes(saltHex), iterations, hash: "SHA-256" },
+    { name: "PBKDF2", salt: new TextEncoder().encode(saltHex), iterations, hash: "SHA-256" },
     material, 256
   );
   return bytesToHex(new Uint8Array(bits));
