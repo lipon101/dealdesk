@@ -207,8 +207,13 @@
         }
       });
     }).catch(function () {
+      /* Backend unreachable (not deployed yet / wrong URL / offline).
+         Degrade gracefully to the LOCAL verifier so the owner is never
+         locked out by a backend problem: run the local PBKDF2 check and
+         note that the backend could not be reached. */
       btn.disabled = false; btn.textContent = "Unlock dashboard";
-      gateMessage("Backend unreachable — check the URL in Settings, or deploy the Worker (README).");
+      gateMessage("Backend unreachable — trying local verification…");
+      doLocalLogin();
     });
   }
 
@@ -447,7 +452,7 @@
       '<div class="topbar"><div><h1>Settings</h1><div class="crumb">Backend API, default affiliate link, security &amp; data</div></div></div>'
       + '<div class="panel"><h2>Backend API (Cloudflare Worker)</h2>'
       + '<div class="panel-sub">Connect the Worker for <strong>server-side auth</strong> (the passphrase is verified on Cloudflare, never in the browser) and <strong>real cross-device stats</strong>. Free forever on Cloudflare\'s free tier. Deploy it first — full guide + code in README → "Cloudflare Worker backend".</div>'
-      + '<div class="form-row"><div class="field"><label>Worker URL (https://…workers.dev)</label><input type="url" id="backendEp" placeholder="https://dealdesk-backend.your-subdomain.workers.dev" value="' + esc(ep) + '"></div>'
+      + '<div class="form-row"><div class="field"><label>Worker URL (https://…workers.dev)</label><input type="url" id="backendEp" placeholder="https://gopromotes-backend.your-subdomain.workers.dev" value="' + esc(ep) + '"></div>'
       + '<button class="btn btn-primary" id="epSave">Save &amp; test</button></div>'
       + '<div class="inline-note" id="epStatus">' + (backendUrl() ? (authedBackend ? "<strong>Connected:</strong> " + esc(ep) + " — you are logged in server-side." : "<strong>Configured but not logged in server-side.</strong> Log out and log back in to obtain a server session, or check the URL.") : "<strong>No backend configured.</strong> Login + stats currently run locally (this browser only).") + "</div></div>"
       + '<div class="panel"><h2>Default affiliate link</h2>'

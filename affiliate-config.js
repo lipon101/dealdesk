@@ -30,19 +30,17 @@
     try { return localStorage.getItem(BACKEND_KEY) || null; } catch (e) { return null; }
   }
 
-  /* Post slug for THIS page (from the filename, matching posts-manifest). */
+  /* Post slug for THIS page (from the filename, matching posts-manifest).
+     Generic derivation: every review page is <slug>-review.html, and the
+     manifest id is the filename minus the "-review" suffix (except
+     essential-addons-elementor-review.html, whose manifest id drops the
+     trailing "-elementor"). This covers ALL 27 review pages, so a per-post
+     override set in the admin panel actually swaps the CTAs on every post. */
   function currentSlug() {
     var path = location.pathname.split("/").pop() || "";
-    var map = {
-      "wp-security-ninja-review.html": "wp-security-ninja",
-      "amical-review.html": "amical",
-      "tidycal-review.html": "tidycal",
-      "zerorank-ai-review.html": "zerorank-ai",
-      "dealdrive-review.html": "dealdrive",
-      "inbox-review.html": "inbox",
-      "essential-addons-elementor-review.html": "essential-addons"
-    };
-    return map[path] || null;
+    var bare = path.replace(/\.html?$/i, "");
+    if (bare === "essential-addons-elementor-review") return "essential-addons";
+    return bare.replace(/-review$/i, "") || null;
   }
 
   function mergeLocalOverrides() {

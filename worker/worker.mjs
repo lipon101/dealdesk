@@ -168,24 +168,41 @@ function cleanSlug(slug) {
 }
 
 /* KV helpers ---------------------------------------------------------------- */
+/* All recording is BEST-EFFORT: a KV write failure (throttling, transient
+   outage) must never break the user-facing behaviour — the affiliate 302
+   redirect still fires, beacons still return 200, page views still count
+   locally. Each helper swallows KV errors and resolves quietly. */
 async function kvInc(env, key, ttlSeconds) {
-  const cur = parseInt((await env.GP_KV.get(key)) || "0", 10) || 0;
-  const next = cur + 1;
-  await env.GP_KV.put(key, String(next), ttlSeconds ? { expirationTtl: ttlSeconds } : undefined);
-  return next;
+  try {
+    const cur = parseInt((await env.GP_KV.get(key)) || "0", 10) || 0;
+    const next = cur + 1;
+    await env.GP_KV.put(key, String(next), ttlSeconds ? { expirationTtl: ttlSeconds } : undefined);
+    return next;
+  } catch (e) { return 0; }
+}
+async function kvGet(env, key) {
+  try { return await env.GP_KV.get(key); } catch (e) { return null; }
+}
+async function kvPut(env, key, value, opts) {
+  try { await env.GP_KV.put(key, value, opts); } catch (e) { /* best-effort */ }
+}
+async function kvDel(env, key) {
+  try { await env.GP_KV.delete(key); } catch (e) { /* best-effort */ }
 }
 async function kvListNames(env, prefix, cap) {
   const names = [];
-  let cursor;
-  const limit = 1000;
-  do {
-    const page = await env.GP_KV.list({ prefix, cursor, limit });
-    for (const k of page.keys) {
-      names.push(k.name);
-      if (cap && names.length >= cap) return names;
-    }
-    cursor = page.cursor;
-  } while (cursor);
+  try {
+    let cursor;
+    const limit = 1000;
+    do {
+      const page = await env.GP_KV.list({ prefix, cursor, limit });
+      for (const k of page.keys) {
+        names.push(k.name);
+        if (cap && names.length >= cap) return names;
+      }
+      cursor = page.cursor;
+    } while (cursor);
+  } catch (e) { /* best-effort: stats degrade to empty, never throw */ }
   return names;
 }
 
@@ -197,7 +214,7 @@ async function recordView(env, slug) {
 async function recordClick(env, slug) {
   await kvInc(env, "agg:clicks:" + slug);
   await kvInc(env, "day:" + todayUTC() + ":click:" + slug, DAY_TTL_SECONDS);
-  await env.GP_KV.put("lastclick:" + slug, new Date().toISOString(), { expirationTtl: DAY_TTL_SECONDS });
+  await kvPut(env, "lastclick:" + slug, new Date().toISOString(), { expirationTtl: DAY_TTL_SECONDS });
 }
 
 /* Sessions + auth ------------------------------------------------------------ */
@@ -206,13 +223,15 @@ async function createSession(env) {
   const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
   const token = await signToken(env, { jti, exp });
   // Keep a KV record keyed by jti so logout can revoke immediately and so we
-  // can list/limit active sessions later if needed.
-  await env.GP_KV.put("session:" + jti, String(exp), { expirationTtl: SESSION_TTL_SECONDS });
+  // can list/limit active sessions later if needed. Best-effort: if the KV
+  // write fails the signed token is still valid until exp (revocation of a
+  // session whose record never persisted is a no-op anyway).
+  await kvPut(env, "session:" + jti, String(exp), { expirationTtl: SESSION_TTL_SECONDS });
   return token;
 }
 async function destroySession(env, token) {
   const payload = await verifyToken(env, token);
-  if (payload && payload.jti) await env.GP_KV.delete("session:" + payload.jti);
+  if (payload && payload.jti) await kvDel(env, "session:" + payload.jti);
 }
 async function bearerToken(request) {
   const h = request.headers.get("Authorization") || "";
@@ -224,21 +243,20 @@ async function isAuthed(request, env) {
   const payload = await verifyToken(env, token);
   if (!payload || !payload.jti) return false;
   // Token must be signed AND still listed in KV (revoked tokens fail here).
-  return (await env.GP_KV.get("session:" + payload.jti)) !== null;
+  return (await kvGet(env, "session:" + payload.jti)) !== null;
 }
 
 /* Login rate limiting (per IP, KV-backed) ------------------------------------ */
 async function loginFailCount(env, ip) {
-  const raw = await env.GP_KV.get("rl:login:" + ip);
-  return raw ? parseInt(raw, 10) || 0 : 0;
+  return parseInt((await kvGet(env, "rl:login:" + ip)) || "0", 10) || 0;
 }
 async function incLoginFail(env, ip) {
   const n = (await loginFailCount(env, ip)) + 1;
-  await env.GP_KV.put("rl:login:" + ip, String(n), { expirationTtl: LOGIN_RATE_WINDOW_SECONDS });
+  await kvPut(env, "rl:login:" + ip, String(n), { expirationTtl: LOGIN_RATE_WINDOW_SECONDS });
   return n;
 }
 async function clearLoginFails(env, ip) {
-  await env.GP_KV.delete("rl:login:" + ip);
+  await kvDel(env, "rl:login:" + ip);
 }
 
 /* Aggregated stats ------------------------------------------------------------ */
@@ -254,7 +272,7 @@ async function buildStats(env) {
     const [type, slug] = [rest.split(":")[0], rest.slice(rest.indexOf(":") + 1)];
     if (!slug) continue;
     if (!perPost[slug]) perPost[slug] = { views: 0, clicks: 0, lastClick: null };
-    const n = parseInt((await env.GP_KV.get(key)) || "0", 10) || 0;
+    const n = parseInt((await kvGet(env, key)) || "0", 10) || 0;
     perPost[slug][type] = n;
     totals[type] += n;
   }
@@ -267,7 +285,7 @@ async function buildStats(env) {
     const date = parts[1], type = parts[2];
     if (type !== "view" && type !== "click") continue;
     if (!days[date]) days[date] = { views: 0, clicks: 0 };
-    const n = parseInt((await env.GP_KV.get(key)) || "0", 10) || 0;
+    const n = parseInt((await kvGet(env, key)) || "0", 10) || 0;
     days[date][type === "view" ? "views" : "clicks"] += n;
   }
   const daySeries = Object.keys(days).sort().slice(-30).map((d) => ({
@@ -277,11 +295,11 @@ async function buildStats(env) {
   const lcKeys = await kvListNames(env, "lastclick:", 2000);
   for (const key of lcKeys) {
     const slug = key.slice("lastclick:".length);
-    if (perPost[slug]) perPost[slug].lastClick = await env.GP_KV.get(key);
+    if (perPost[slug]) perPost[slug].lastClick = await kvGet(env, key);
   }
 
   const affKeys = await kvListNames(env, "aff:", 500);
-  for (const key of affKeys) overrides[key.slice("aff:".length)] = await env.GP_KV.get(key);
+  for (const key of affKeys) overrides[key.slice("aff:".length)] = await kvGet(env, key);
 
   return { totals, perPost, days: daySeries, overrides };
 }
@@ -289,7 +307,7 @@ async function buildStats(env) {
 async function listAffiliateOverrides(env) {
   const overrides = {};
   const affKeys = await kvListNames(env, "aff:", 500);
-  for (const key of affKeys) overrides[key.slice("aff:".length)] = await env.GP_KV.get(key);
+  for (const key of affKeys) overrides[key.slice("aff:".length)] = await kvGet(env, key);
   return overrides;
 }
 
@@ -310,9 +328,9 @@ export default {
     if (path === "/api/click" && method === "GET") {
       const slug = cleanSlug(url.searchParams.get("slug"));
       if (!slug) return err("missing or invalid slug", 400);
-      const override = await env.GP_KV.get("aff:" + slug);
+      const override = await kvGet(env, "aff:" + slug);
       const target = override || env.DEFAULT_AFFILIATE || DEFAULT_AFFILIATE;
-      await recordClick(env, slug);
+      await recordClick(env, slug);   // best-effort: redirect fires even if KV fails
       return Response.redirect(target, 302);
     }
     if (path === "/api/click" && method === "POST") {
@@ -320,7 +338,7 @@ export default {
       const slug = cleanSlug(body && body.slug);
       if (!slug) return err("missing or invalid slug", 400);
       await recordClick(env, slug);
-      const override = await env.GP_KV.get("aff:" + slug);
+      const override = await kvGet(env, "aff:" + slug);
       return json({ ok: true, target: override || env.DEFAULT_AFFILIATE || DEFAULT_AFFILIATE });
     }
 
@@ -392,11 +410,11 @@ export default {
       const slug = cleanSlug(body && body.slug);
       if (!slug) return err("missing or invalid slug", 400);
       if (body.url == null || body.url === "") {
-        await env.GP_KV.delete("aff:" + slug);
+        await kvDel(env, "aff:" + slug);
       } else {
         const u = String(body.url);
         if (!/^https:\/\/[a-z0-9.-]/i.test(u)) return err("url must start with https://", 400);
-        await env.GP_KV.put("aff:" + slug, u);
+        await kvPut(env, "aff:" + slug, u);
       }
       const overrides = await listAffiliateOverrides(env);
       return json({ ok: true, overrides });

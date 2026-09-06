@@ -27,7 +27,7 @@
 
   var CFG = {
     /* Fallback URL used when localStorage has none (set it here to hardcode
-       a backend into every deploy, e.g. "https://dealdesk-backend.xxx.workers.dev"). */
+       a backend into every deploy, e.g. "https://gopromotes-backend.xxx.workers.dev"). */
     backendUrl: null,
     statsKey: "dd_stats_v1",
     viewKeyPrefix: "dd_viewed_",
