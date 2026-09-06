@@ -259,6 +259,9 @@ table.grid td.num { font-variant-numeric: tabular-nums; font-weight: 600; }
 
 .inline-note { font-size: .8rem; color: var(--ink-faint); background: var(--paper-2); border-radius: 8px; padding: 8px 12px; margin: 8px 0 14px; line-height: 1.5; }
 .inline-note code { background: #fff; border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+.inline-note.ok-note { color: #0a7a44; background: #eef6f0; border: 1px solid #d5e8da; }
+.meter { height: 8px; border-radius: 99px; background: #e6e9e6; overflow: hidden; }
+.meter-bar { height: 100%; border-radius: 99px; background: #ccc; transition: width .25s ease, background .25s ease; }
 
 .toast {
   position: fixed; bottom: 24px; right: 24px;

@@ -3,21 +3,24 @@
    -------------------------------------------------------------------------
    Holds the PBKDF2 credential verifier used by the admin login gate.
 
-   ▶ DEFAULT PASSPHRASE (working):  GoPromotes#Ridge7!Cipher
-     Log in with it now, then change it to your own (steps below).
+   ▶ NO default passphrase ships with the site. The salt + hash below are
+     for the OWNER-ONLY passphrase that was generated at setup and given to
+     the owner privately. It is NOT written in any file here. If you are a
+     visitor, stop — you cannot log in.
 
    HOW TO CHANGE THE PASSPHRASE:
      1. Pick a strong passphrase (16+ chars, mixed case + digits + symbols).
-     2. Generate a fresh salt + hash with:
+     2. Generate a fresh salt + hash with 600,000 iterations:
           node -e "const c=require('crypto');const s=c.randomBytes(16).toString('hex');
-                   console.log(JSON.stringify({salt:s,iter:310000,
-                     hash:c.pbkdf2Sync('YOUR_NEW_PASSPHRASE', s, 310000, 32, 'sha256').toString('hex')}))"
+                   console.log(JSON.stringify({salt:s,iter:600000,
+                     hash:c.pbkdf2Sync('YOUR_NEW_PASSPHRASE', s, 600000, 32, 'sha256').toString('hex')}))"
+        (or use tools/hash-generator.html — it now defaults to 600,000 too)
      3. Paste the three values below (salt, iterations, hash) and commit.
      NEVER store the plain passphrase here.
 
    WHY PBKDF2: Web Crypto API (window.crypto.subtle) implements PBKDF2 in
    every modern browser, so the login gate can verify the passphrase with
-   the same audited KDF used by password managers — 310,000 iterations,
+   the same audited KDF used by password managers — 600,000 iterations,
    SHA-256, random per-install salt. See README → "Security model" for the
    honest limits of client-side auth on a static host and the serverless
    upgrade path (worker/ in this folder = the real-security deployment).
@@ -31,9 +34,9 @@
 
 window.DD_ADMIN_CFG = {
   /* PBKDF2-SHA256 verifier (hex). Change these three values together. */
-  salt: "9f5b7f7149ccc5fe0f8f2cf2453a26ae",
-  iterations: 310000,
-  hash: "b1740c47fd070f85e5ffd5931c255e3e6224b60752e25486f12c64861275e4db",
+  salt: "c3cc35771388b9efd1649368e1308776",
+  iterations: 600000,
+  hash: "677691aff95644b024fcbcb55e8c6cc4c1fceb4b56dddbb6d4bd9fbdcbad5735",
 
   /* Session token lives in sessionStorage under this key (cleared when the
      tab closes — never localStorage, so it cannot persist after logout). */

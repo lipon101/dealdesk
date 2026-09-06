@@ -6,6 +6,8 @@
 <title>GoPromotes — Passphrase Hash Generator (admin tool)</title>
 <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <meta name="theme-color" content="#0a5a38">
 <style>
   :root { --green:#0a5a38; --gold:#e8a33d; --ink:#1c2430; --bg:#f5f7f5; --line:#e3e8e4; }
   * { box-sizing:border-box; }
@@ -58,7 +60,7 @@
     <ol class="steps">
       <li>Open the admin panel, log out, then open this page in a new tab.</li>
       <li>Type (or generate) a strong passphrase — 16+ chars, mixed case, digits and symbols.</li>
-      <li>Click <b>Generate hash</b> and copy the JSON block.</li>
+      <li>Click <b>Generate hash</b> and copy the JSON block (PBKDF2-SHA256, 600,000 iterations, fresh random salt).</li>
       <li>Open <code>admin-config.js</code> next to the admin page and replace the three values (<code>salt</code>, <code>iterations</code>, <code>hash</code>).</li>
       <li>Save, upload to your host, and log in with the new passphrase. <b>Never store the plaintext passphrase in the file.</b></li>
     </ol>
@@ -69,7 +71,7 @@
 <script>
 (function () {
   "use strict";
-  var ITER = 310000;
+  var ITER = 600000;
   var enc = new TextEncoder();
   var statusEl = document.getElementById("status");
   var outEl = document.getElementById("out");
@@ -88,9 +90,9 @@
   }
 
   document.getElementById("rand").addEventListener("click", function () {
-    var w = ["Maple","Willow","Cobalt","Falcon","Ridge","Summit","Quartz","Ember","Cedar","Nova"];
-    var n = w[Math.floor(Math.random()*w.length)] + Math.floor(Math.random()*90+10) + "!" + w[Math.floor(Math.random()*w.length)];
-    passEl.value = "GoPromotes#" + n;
+    var w = ["Maple","Willow","Cobalt","Falcon","Ridge","Summit","Quartz","Ember","Cedar","Nova","Kestrel","Aurora"];
+    var n = w[Math.floor(Math.random()*w.length)] + Math.floor(Math.random()*900+100) + "!" + w[Math.floor(Math.random()*w.length)] + Math.floor(Math.random()*90+10);
+    passEl.value = n;
     passEl.focus();
   });
 

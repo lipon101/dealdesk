@@ -14,7 +14,7 @@
      apply to every visitor instantly.
 
      LOCAL MODE (automatic fallback): with no backend configured, the gate
-     verifies PBKDF2 in the browser against admin-config.js (310,000
+     verifies PBKDF2 in the browser against admin-config.js (600,000
      iterations + exponential-backoff lockout) and the dashboard reads the
      local analytics in this browser. Honest limits: client-side auth is
      NOT truly secure on a static host — anyone with the source can read
@@ -454,7 +454,102 @@
       + '<div class="settings-block"><p><strong>' + (backendUrl() ? "Backend mode" : "Local mode") + ':</strong> ' + (backendUrl() ? "the passphrase is verified server-side (PBKDF2-SHA256 on the Worker, rate-limited per IP). The hash never ships to the browser." : "the passphrase is verified in this browser against a PBKDF2-SHA256 hash with exponential-backoff lockout. Because the site is static, the verifier travels with the source — a determined attacker with your files can bypass it. For real protection, deploy the Cloudflare Worker backend (below) — the passphrase then never leaves your browser in a form that can be replayed.") + "</p>"
       + '<p style="font-size:.8rem;color:var(--ink-faint)">Session ends when you close this tab, or use the Log out button in the sidebar.</p></div></div>'
       + '<div class="panel"><h2>Data</h2><div class="settings-block"><p>Local stats live in localStorage under <code>dd_stats_v1</code>. Clearing wipes views and clicks recorded in this browser. Backend stats live in Cloudflare KV (45-day retention on daily rollups) and are shown on the Dashboard.</p>'
-      + '<button class="btn btn-ghost" id="statsClear" style="color:var(--bad);border-color:#e5b9b2">Clear local stats</button></div></div>';
+      + '<button class="btn btn-ghost" id="statsClear" style="color:var(--bad);border-color:#e5b9b2">Clear local stats</button></div></div>'
+      + '<div class="panel"><h2>Security — change admin passphrase</h2>'
+      + '<div class="settings-block"><p>Generate a strong new passphrase, then verify it with your <strong>current</strong> passphrase (your existing login proves you are the owner). The new passphrase is <strong>never stored in plaintext</strong> — this tool derives a PBKDF2-SHA256 salt + hash (600,000 iterations) in your browser and gives you a ready-to-commit block for <code>admin-config.js</code>.</p>'
+      + '<div class="form-row"><div class="field"><label>Current passphrase</label><input type="password" id="chgCurrent" autocomplete="off" spellcheck="false" style="font-family:ui-monospace,Menlo,Consolas,monospace"></div></div>'
+      + '<div class="form-row" style="margin-top:10px"><div class="field"><label>New passphrase (16+ chars, mixed case, digits &amp; symbols)</label><input type="password" id="chgNew" autocomplete="new-password" spellcheck="false" style="font-family:ui-monospace,Menlo,Consolas,monospace"></div>'
+      + '<div class="field"><label>Repeat new passphrase</label><input type="password" id="chgNew2" autocomplete="new-password" spellcheck="false" style="font-family:ui-monospace,Menlo,Consolas,monospace"></div></div>'
+      + '<div class="meter" id="chgMeterWrap" style="margin:8px 0 2px"><div class="meter-bar" id="chgMeter" style="width:0%"></div></div><div class="meter-label" id="chgMeterLabel" style="font-size:.75rem;color:var(--ink-faint);margin-bottom:10px">Passphrase strength</div>'
+      + '<div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-ghost" id="chgSuggest" type="button">Suggest strong passphrase</button>'
+      + '<button class="btn btn-primary" id="chgGo" type="button">Generate hash &amp; reveal block</button></div>'
+      + '<div class="inline-note" style="margin-top:10px" id="chgNote">1. Suggest or type a new passphrase → 2. confirm your current passphrase → 3. Generate. You then copy the block below into <code>admin-config.js</code> (replace <code>salt</code>, <code>iterations</code>, <code>hash</code>) and redeploy. Log in with the new passphrase afterwards.</div>'
+      + '<div id="chgOut" style="display:none;margin-top:12px"><p class="hint" style="margin:0 0 4px;font-size:.8rem">Paste into <code>admin-config.js</code>:</p><pre id="chgJson" style="font-size:12px;line-height:1.45;overflow-x:auto"></pre><p class="hint" style="font-size:.78rem;color:var(--bad);margin:6px 0 0"><strong>Remember your new passphrase.</strong> It cannot be recovered — write it in your password manager now. The old passphrase stops working the moment you redeploy with the new hash.</p></div>'
+      + '</div></div>';
+  }
+
+  /* ---------- change-passphrase flow (Settings → Security) ---------- */
+  function strengthScore(p) {
+    var s = 0;
+    if (!p) return 0;
+    if (p.length >= 12) s += 1;
+    if (p.length >= 16) s += 1;
+    if (p.length >= 22) s += 1;
+    if (/[A-Z]/.test(p) && /[a-z]/.test(p)) s += 1;
+    if (/[0-9]/.test(p)) s += 1;
+    if (/[^A-Za-z0-9]/.test(p)) s += 1;
+    if (s >= 5) return 4; if (s >= 4) return 3; if (s >= 3) return 2; if (s >= 2) return 1; return 0;
+  }
+  function renderStrength(p) {
+    var bar = $("#chgMeter"), lbl = $("#chgMeterLabel");
+    if (!bar || !lbl) return;
+    var score = strengthScore(p);
+    var labels = ["Too weak","Weak","Fair","Strong","Very strong"];
+    var colors = ["#b42318","#d97706","#e8a33d","#4d9b6a","#0a7a44"];
+    var widths = ["8%","30%","55%","80%","100%"];
+    bar.style.width = widths[score];
+    bar.style.background = colors[score];
+    lbl.textContent = "Passphrase strength — " + labels[score] + (score >= 3 ? " ✓" : "");
+  }
+  function suggestPassphrase() {
+    var alpha = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    var syms = "!@#$%^&*-_=+?";
+    function pick(set) { return set.charAt(Math.floor(Math.random() * set.length)); }
+    var s = "";
+    for (var i = 0; i < 22; i++) s += pick(alpha);
+    s = s.slice(0, 7) + pick(syms) + s.slice(7);
+    s = s.slice(0, 15) + pick(syms) + s.slice(15);
+    if (!/[0-9]/.test(s)) s = s.slice(0, 3) + "7" + s.slice(3);
+    if (!/[A-Z]/.test(s)) s = "Q" + s.slice(1);
+    if (!/[a-z]/.test(s)) s = s.slice(0, 2) + "x" + s.slice(2);
+    return s;
+  }
+  function bindSecurity() {
+    var current = $("#chgCurrent"), n1 = $("#chgNew"), n2 = $("#chgNew2");
+    if (!current || !n1 || !n2) return;
+    var note = $("#chgNote");
+    n1.addEventListener("input", function () { renderStrength(n1.value); });
+    $("#chgSuggest").addEventListener("click", function () {
+      n1.value = suggestPassphrase(); n2.value = n1.value; renderStrength(n1.value);
+      note.className = "inline-note ok-note";
+      note.innerHTML = "<strong>Suggested passphrase filled in both fields.</strong> If you keep it, copy it to your password manager now — it is shown only here and never stored.";
+    });
+    $("#chgGo").addEventListener("click", function () {
+      var cur = current.value;
+      if (!cur) { toast("Enter your current passphrase first.", true); return; }
+      if (n1.value.length < 16) { toast("New passphrase must be at least 16 characters.", true); return; }
+      if (strengthScore(n1.value) < 3) { toast("New passphrase is too weak — use mixed case, digits and symbols.", true); return; }
+      if (n1.value !== n2.value) { toast("New passphrase fields do not match.", true); return; }
+      var btn = $("#chgGo");
+      btn.disabled = true; btn.textContent = "Verifying current passphrase\u2026";
+      pbkdf2(cur, CFG.salt, CFG.iterations).then(function (hex) {
+        if (!constEq(hex, CFG.hash)) {
+          btn.disabled = false; btn.textContent = "Generate hash & reveal block";
+          toast("Current passphrase is incorrect.", true);
+          current.value = ""; return;
+        }
+        btn.textContent = "Deriving new hash (600,000 iterations)\u2026";
+        var saltBytes = new Uint8Array(16);
+        crypto.getRandomValues(saltBytes);
+        var saltHex = Array.prototype.map.call(saltBytes, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+        return crypto.subtle.importKey("raw", new TextEncoder().encode(n1.value), "PBKDF2", false, ["deriveBits"])
+          .then(function (key) {
+            return crypto.subtle.deriveBits({ name: "PBKDF2", salt: saltBytes, iterations: 600000, hash: "SHA-256" }, key, 256);
+          })
+          .then(function (bits) {
+            var hx = Array.prototype.map.call(new Uint8Array(bits), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+            $("#chgJson").textContent = "salt: \"" + saltHex + "\",\niterations: 600000,\nhash: \"" + hx + "\"";
+            $("#chgOut").style.display = "block";
+            note.className = "inline-note";
+            note.innerHTML = "<strong>Done.</strong> Copy the block into <code>admin-config.js</code>, redeploy, then log in with your new passphrase. Your current passphrase still works until you redeploy the new hash.";
+            toast("New hash generated — copy it into admin-config.js.");
+            btn.disabled = false; btn.textContent = "Generate hash & reveal block";
+          });
+      }).catch(function () {
+        btn.disabled = false; btn.textContent = "Generate hash & reveal block";
+        toast("Web Crypto unavailable in this browser.", true);
+      });
+    });
   }
 
   function show(view) {
@@ -537,6 +632,7 @@
         var savedEp = backendUrl();
         if (savedEp) $("#backendEp").value = savedEp;
       } catch (e) {}
+      bindSecurity();
       $("#statsClear").addEventListener("click", function () {
         if (!confirm("Clear all locally recorded views and clicks?")) return;
         if (window.DealDeskStats) window.DealDeskStats.clear();
@@ -558,7 +654,7 @@
       /* show which mode the gate will use */
       var hint = $(".gate-hint");
       if (hint && backendUrl()) hint.innerHTML = "Server-side verification via Cloudflare Worker (PBKDF2-SHA256, IP rate-limited).<br>Repeated failures trigger an automatic lockout.";
-      else if (hint) hint.innerHTML = "PBKDF2-SHA256 verified in your browser with 310,000 iterations.<br>Repeated failures trigger an automatic lockout with backoff.";
+      else if (hint) hint.innerHTML = "PBKDF2-SHA256 verified in your browser with 600,000 iterations.<br>Repeated failures trigger an automatic lockout with backoff.";
     }
     bindStatic();
   });

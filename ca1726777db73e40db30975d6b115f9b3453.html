@@ -14,6 +14,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#0a5a38">
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -28,7 +30,7 @@
       <label for="passInput">Passphrase</label>
       <input type="password" id="passInput" placeholder="Enter your passphrase" autocomplete="off">
       <button type="submit" class="btn btn-primary" id="loginBtn">Unlock dashboard</button>
-      <p class="gate-hint">PBKDF2-SHA256 verified in your browser with 310,000 iterations.<br>Repeated failures trigger an automatic lockout with backoff.</p>
+      <p class="gate-hint">PBKDF2-SHA256 verified in your browser with 600,000 iterations.<br>Repeated failures trigger an automatic lockout with backoff.</p>
       <p class="gate-hint" style="margin-top:12px;font-size:12.5px;"><a href="tools/hash-generator.html" target="_blank" rel="noopener">How to change the passphrase &rarr;</a></p>
     </form>
   </div>
