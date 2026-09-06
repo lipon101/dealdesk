@@ -186,6 +186,106 @@ window.DD_POSTS = [
     "price": "from $59",
     "dealUrl": "https://appsumo.com/products/bannerboo/",
     "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "switchy",
+    "file": "switchy-review.html",
+    "title": "Switchy Review: Is the AppSumo Link Retargeting Deal Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "Switchy",
+    "price": "from $39",
+    "dealUrl": "https://appsumo.com/products/switchy/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "writerzen",
+    "file": "writerzen-review.html",
+    "title": "WriterZen Review: Is the AppSumo SEO Toolkit Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "WriterZen",
+    "price": "from $79",
+    "dealUrl": "https://appsumo.com/products/writerzen/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "divhunt",
+    "file": "divhunt-review.html",
+    "title": "Divhunt Review: Is the AppSumo Website Builder Worth It?",
+    "category": "build-code",
+    "vendor": "Divhunt",
+    "price": "from $79",
+    "dealUrl": "https://appsumo.com/products/divhunt/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "viloud",
+    "file": "viloud-review.html",
+    "title": "Viloud Review: Is the AppSumo Online TV Channel Worth It?",
+    "category": "media-design",
+    "vendor": "Viloud",
+    "price": "from $99",
+    "dealUrl": "https://appsumo.com/products/viloud/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "elkqr",
+    "file": "elkqr-review.html",
+    "title": "ElkQR Review: Is the AppSumo QR Code Manager Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "ElkQR",
+    "price": "from $39",
+    "dealUrl": "https://appsumo.com/products/elkqr/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "growify",
+    "file": "growify-review.html",
+    "title": "Growify Review: Is the AppSumo Ad Attribution Deal Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "Growify",
+    "price": "from $69",
+    "dealUrl": "https://appsumo.com/products/growify/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "hedy-ai",
+    "file": "hedy-ai-review.html",
+    "title": "Hedy AI Review: Is the AppSumo Meeting Assistant Worth It?",
+    "category": "operations",
+    "vendor": "Hedy AI",
+    "price": "$179 one-time",
+    "dealUrl": "https://appsumo.com/products/hedy-ai/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "updf",
+    "file": "updf-review.html",
+    "title": "UPDF Review: Is the AppSumo PDF Editor Worth It?",
+    "category": "operations",
+    "vendor": "UPDF",
+    "price": "$69 one-time",
+    "dealUrl": "https://appsumo.com/products/updf/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "goose-vpn",
+    "file": "goose-vpn-review.html",
+    "title": "GOOSE VPN Review: Is the AppSumo Lifetime VPN Worth It?",
+    "category": "operations",
+    "vendor": "GOOSE VPN",
+    "price": "from $29",
+    "dealUrl": "https://appsumo.com/products/goose-vpn/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "onlinecoursehost",
+    "file": "onlinecoursehost-review.html",
+    "title": "OnlineCourseHost Review: Is the AppSumo Course Platform Worth It?",
+    "category": "operations",
+    "vendor": "OnlineCourseHost.com",
+    "price": "from $99",
+    "dealUrl": "https://appsumo.com/products/onlinecoursehost-com/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
   }
 ];
 
