@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="56" viewBox="0 0 200 56" role="img" aria-label="GoPromotes">
+  <defs>
+    <linearGradient id="gpMarkGradLt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0d7a4c"/>
+      <stop offset="1" stop-color="#0a5a38"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <path d="M39.15 43.54 A15 15 0 1 0 42.27 28.86" fill="none" stroke="#0a5a38" stroke-width="5.6" stroke-linecap="round"/>
+    <path d="M39.15 43.54 L48.15 26.04 L54.32 14.03 L52.4 20.6 Z" fill="#e8a33d"/>
+    <path d="M54.32 14.03 L54.07 8.84 L50.72 14.8 Z" fill="#e8a33d"/>
+    <path d="M54.32 14.03 L58.69 11.22 L56.6 16.9 Z" fill="#e8a33d"/>
+  </g>
+  <text x="70" y="34" font-family="'Sora','Segoe UI',system-ui,-apple-system,Arial,sans-serif" font-size="22" font-weight="700" letter-spacing="-0.5" fill="#10231b">GoPromotes</text>
+  <text x="70" y="48" font-family="'Inter','Segoe UI',system-ui,Arial,sans-serif" font-size="9" font-weight="600" letter-spacing="3" fill="#5b6672">SOFTWARE DEALS &amp; GUIDES</text>
+</svg>
