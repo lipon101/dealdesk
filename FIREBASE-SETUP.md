@@ -1,6 +1,6 @@
 # Set up REAL Firebase Auth for the GoPromotes admin panel
 
-This guide makes the hidden admin panel (https://gopromotes.com/<secret-slug>.html)
+This guide makes the hidden admin panel (https://gopromotes.com/lostsec.html)
 authenticate with **Firebase Auth** - Google's server-side identity service -
 instead of the client-side passphrase verifier.
 
@@ -74,12 +74,13 @@ window.DD_FIREBASE_CFG = {
    legacy passphrase. The allow-list check runs after every sign-in: any
    email not listed is signed out immediately with "Access denied".
 
-## Rollback (if you ever want the passphrase gate back)
+## Rollback (removed in v18)
 
-Set `enabled: false` in `firebase-config.js` (or restore the placeholder
-apiKey) and push. The gate reverts to the clearly-labelled legacy passphrase
-fallback automatically - the PBKDF2 verifier in `admin-config.js` is
-untouched and still works.
+The legacy passphrase / PBKDF2 gate was **removed in v18** - there is no
+passphrase anymore, and `admin-config.js` no longer contains any salt/hash
+verifier. If you ever want to stop using Firebase you would have to add a new
+auth mechanism from scratch; this is deliberate, because any client-side
+passphrase verifier in a public repo can be read and brute-forced.
 
 ## Security notes
 
@@ -88,9 +89,9 @@ untouched and still works.
   security comes from Firebase Authentication + the allow-list.
 - Revoking access = delete the user in Firebase console (Authentication ->
   Users) or remove their email from `adminEmails` and push.
-- The legacy passphrase flow is intentionally kept as a clearly-labelled
-  fallback while Firebase is not configured, so you can never be locked out
-  of the panel.
+- The gate shows **only** Firebase email/password + Google sign-in. There is
+  no fallback passphrase, and if Firebase is ever unreachable the panel is
+  not accessible (the correct behaviour for a security-critical gate).
 - Free-tier honesty: the Spark plan has no expiry or card, but like every
   free tier it is a standing offer subject to Google's terms. For a
   single-owner admin gate it is effectively permanent.

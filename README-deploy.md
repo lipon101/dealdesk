@@ -6,12 +6,12 @@ live site needs and nothing else:
 - all public HTML pages (plus the hidden admin page at its secret slug)
 - `styles.css`, `script.js`, `analytics.js`, `affiliate-config.js`,
   `posts-manifest.js`, `admin.js`, `admin.css`
-- `admin-config.js` — **hash-only** credential verifier (never contains the
-  plaintext passphrase; see the site README §4)
+- `admin-config.js` — **secret-free** runtime settings only (the legacy
+  passphrase verifier was removed in v18 — Firebase Auth is the only login)
 - `images/` — all self-hosted product images
 - `robots.txt`, `sitemap.xml`, `favicon.svg`
-- `firebase-config.js` — placeholder Firebase Auth config (disabled until
-  you fill it in — see FIREBASE-SETUP.md)
+- `firebase-config.js` — real Firebase Auth config (see FIREBASE-SETUP.md)
+- `lostsec.html` — the hidden admin panel (noindex, robots-disallowed)
 
 Not included on purpose: the `worker/` backend source (deploy that to
 Cloudflare separately — see site README §6) and `post-template.html` (internal
@@ -64,13 +64,14 @@ git push -u origin main
 - [ ] Replace every `https://gopromotes.com/...` with your real domain
       in: all HTML `rel="canonical"`, `robots.txt` (`Sitemap:` line) and
       `sitemap.xml` (all `<loc>` entries).
-- [ ] Change the admin passphrase (site README §4) and confirm the new hash is
-      in `admin-config.js`.
+- [ ] Set YOUR admin email in `adminEmails` in `firebase-config.js` (the
+      allow-list rejects every other account) and confirm `enabled:true`.
 - [ ] If you renamed the admin page, update the `Disallow:` line in
       `robots.txt` and the secret-URL note in the README.
-- [ ] (Recommended) Deploy the Cloudflare Worker backend (site README §6) and
-      save its URL in the admin **Settings → Backend API** so stats are real
-      and auth is server-side.
+- [ ] (Optional) Deploy the Cloudflare Worker backend (restore worker/ from the
+      v17 commit) and save its URL in the admin **Settings → Backend API** so
+      stats are real cross-device numbers. Auth is Firebase-only; the Worker
+      is not required.
 - [ ] Verify: `curl -I https://<your-domain>/index.html`, then submit
       `sitemap.xml` in Google Search Console.
 

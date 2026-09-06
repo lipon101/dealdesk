@@ -1,5 +1,14 @@
 # Deploy GoPromotes Backend to Cloudflare Workers + KV (FREE, lifetime, always-active)
 
+> ⚠️ **ARCHIVED (v18):** the Cloudflare Worker source (`worker/worker.mjs`,
+> `wrangler.toml`) is **no longer shipped in this repo** — the admin panel is
+> now **Firebase-only** (no passphrase, no Worker login). This guide is kept
+> for reference only. If you ever want the optional Worker for real
+> cross-device stats / click redirects, restore `worker/` from the **v17
+> commit** (`git show v17-commit-hash:worker/worker.mjs`) and deploy from
+> there. The Worker is optional — it is NOT used for admin authentication
+> anymore.
+
 This is the ready-to-deploy package for the GoPromotes admin backend. It gives
 you **real server-side admin auth** (the passphrase is verified on Cloudflare,
 never in the browser) and **real cross-device stats** (every visitor, every
@@ -85,7 +94,12 @@ wrangler deploy
 
 1. Open your admin panel (secret URL — see your latest report; it is not
    linked anywhere and robots.txt disallows it):
-   `https://gopromotes.com/a33a2d1d4139c87941145395f63ab78d62ef645ee524d5a6.html`
+   NOTE: the Cloudflare Worker source is no longer shipped in this repo
+   (removed in v18). If you want the optional backend, restore
+   worker/worker.mjs + wrangler.toml from the v17 commit and deploy from
+   there. Auth is Firebase-only now; the Worker is optional and used only
+   for real cross-device stats + click redirects.
+   `https://gopromotes.com/lostsec.html`
 2. **Settings → Backend API** → paste your Worker URL
    (`https://gopromotes-backend.<your-subdomain>.workers.dev`) → **Save & test**
    (it calls `/api/health`).
