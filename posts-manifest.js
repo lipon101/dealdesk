@@ -86,6 +86,106 @@ window.DD_POSTS = [
     "price": "from $49",
     "dealUrl": "https://appsumo.com/products/amical/",
     "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "truconversion",
+    "file": "truconversion-review.html",
+    "title": "TruConversion Review: Is the AppSumo Heatmap Deal Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "TruConversion",
+    "price": "from $79",
+    "dealUrl": "https://appsumo.com/products/truconversion/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "katteb",
+    "file": "katteb-review.html",
+    "title": "Katteb Review: Is the AppSumo AI Writer Deal Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "Katteb",
+    "price": "from $39",
+    "dealUrl": "https://appsumo.com/products/katteb/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "reoon-email-verifier",
+    "file": "reoon-email-verifier-review.html",
+    "title": "Reoon Email Verifier Review: Is the AppSumo Deal Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "Reoon Email Verifier",
+    "price": "from $79",
+    "dealUrl": "https://appsumo.com/products/reoon-email-verifier/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "flexclip",
+    "file": "flexclip-review.html",
+    "title": "FlexClip Review: Is the AppSumo Video Editor Deal Worth It?",
+    "category": "media-design",
+    "vendor": "FlexClip",
+    "price": "from $99",
+    "dealUrl": "https://appsumo.com/products/flexclip/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "salesblink",
+    "file": "salesblink-review.html",
+    "title": "SalesBlink Review: Is the AppSumo Cold-Email Deal Worth It?",
+    "category": "crm-sales-tools",
+    "vendor": "SalesBlink",
+    "price": "from $79",
+    "dealUrl": "https://appsumo.com/products/salesblink/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "leadrocks",
+    "file": "leadrocks-review.html",
+    "title": "LeadRocks Review: Is the AppSumo B2B Database Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "LeadRocks",
+    "price": "from $79",
+    "dealUrl": "https://appsumo.com/products/leadrocks/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "sendfox",
+    "file": "sendfox-review.html",
+    "title": "SendFox Review: Is the AppSumo Email Deal Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "SendFox",
+    "price": "from $29",
+    "dealUrl": "https://appsumo.com/products/sendfox/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "gobrunch",
+    "file": "gobrunch-review.html",
+    "title": "GoBrunch Review: Is the AppSumo Webinar Deal Worth It?",
+    "category": "customer-engagement",
+    "vendor": "GoBrunch",
+    "price": "from $89",
+    "dealUrl": "https://appsumo.com/products/gobrunch/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "acadle",
+    "file": "acadle-review.html",
+    "title": "Acadle Review: Is the AppSumo LMS Deal Worth It?",
+    "category": "customer-engagement",
+    "vendor": "Acadle",
+    "price": "from $109",
+    "dealUrl": "https://appsumo.com/products/acadle/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
+  },
+  {
+    "id": "bannerboo",
+    "file": "bannerboo-review.html",
+    "title": "BannerBoo Review: Is the AppSumo Ad Designer Worth It?",
+    "category": "marketing-sales-leads",
+    "vendor": "BannerBoo",
+    "price": "from $59",
+    "dealUrl": "https://appsumo.com/products/bannerboo/",
+    "defaultAff": "https://appsumo.8odi.net/Ag17e7"
   }
 ];
 
