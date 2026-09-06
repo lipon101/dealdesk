@@ -59,7 +59,7 @@
 
   /* ---------- backend config (shared localStorage key) ---------- */
   function backendUrl() {
-    try { return localStorage.getItem(CFG.backendUrlKey) || null; } catch (e) { return null; }
+    try { return localStorage.getItem(CFG.backendUrlKey) || CFG.backendUrl || null; } catch (e) { return CFG.backendUrl || null; }
   }
   function saveBackendUrl(u) {
     try {
@@ -648,13 +648,13 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    if (sessionGet()) { enterApp(); } else {
+    if (sessionGet()) {
+      enterApp();
+    } else {
+      /* Show the gate; the "how to change the passphrase" hint is now a single
+         subtle link in the markup — no verbose helper copy is injected. */
       $("#gate").classList.remove("hidden");
       $("#app").classList.add("hidden");
-      /* show which mode the gate will use */
-      var hint = $(".gate-hint");
-      if (hint && backendUrl()) hint.innerHTML = "Server-side verification via Cloudflare Worker (PBKDF2-SHA256, IP rate-limited).<br>Repeated failures trigger an automatic lockout.";
-      else if (hint) hint.innerHTML = "PBKDF2-SHA256 verified in your browser with 600,000 iterations.<br>Repeated failures trigger an automatic lockout with backoff.";
     }
     bindStatic();
   });

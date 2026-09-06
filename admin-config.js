@@ -53,7 +53,9 @@ window.DD_ADMIN_CFG = {
   lockoutMs: 30000,
   attemptsKey: "dd_admin_attempts",
 
-  /* Shared key where the backend URL lives (admin Settings tab writes it;
-     affiliate-config.js + analytics.js + admin.js all read it). */
-  backendUrlKey: "dd_backend_url"
+  /* Backend mode: set the Cloudflare Worker URL here to make it the DEFAULT
+     for every visitor (they will use server-side auth + real cross-device
+     stats even before anyone opens Settings). Leave null to start in local
+     mode and configure per-browser from the admin panel. */
+  backendUrl: null,
 };

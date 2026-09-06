@@ -1,30 +1,34 @@
 # ============================================================================
-# DealDesk backend — wrangler.toml
+# GoPromotes backend — wrangler.toml
 # ----------------------------------------------------------------------------
 # 1) npm i -g wrangler && wrangler login
-# 2) wrangler kv namespace create DD_KV
-#      → copy the printed id into the `id` below (REPLACE_ME)
+# 2) wrangler kv namespace create GP_KV
+#      → copy the printed id into the `id` below (REPLACE_WITH_YOUR_KV_NAMESPACE_ID)
 # 3) wrangler secret put ADMIN_SALT   # hex salt, 32 hex chars (16 bytes)
 #    wrangler secret put ADMIN_HASH   # hex PBKDF2-SHA256 hash (64 hex chars)
-#    wrangler secret put ADMIN_ITER   # 310000
+#    wrangler secret put ADMIN_ITER   # 600000
+#    wrangler secret put SESSION_SECRET   # any long random string (optional but
+#                                         # recommended; auto-derived if unset)
 #      (values: generate exactly like admin-config.js documents — or reuse
-#       the salt/hash currently inside admin-config.js)
+#       the salt/hash currently inside admin-config.js; ADMIN_ITER defaults
+#       to 600000 when unset)
 # 4) wrangler deploy
 # 5) Optional: give the Worker a nicer route:
 #      wrangler routes add 'api.yourdomain.com/*'
 #      then set `workers_dev = false` below and add the route.
+# Full guide: DEPLOY-CLOUDFLARE.md in the site root.
 # ============================================================================
 
-name = "dealdesk-backend"
+name = "gopromotes-backend"
 main = "worker.mjs"
 compatibility_date = "2025-01-01"
 workers_dev = true
 
 # Optional production route on your own domain (see step 5 above)
-# routes = [{ pattern = "api.yourdomain.com/*", zone_name = "yourdomain.com" }]
+# routes = [{ pattern = "api.gopromotes.com/*", zone_name = "gopromotes.com" }]
 
 [[kv_namespaces]]
-binding = "DD_KV"
+binding = "GP_KV"
 id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
 
 # Optional: change the affiliate link the Worker redirects to without code.
