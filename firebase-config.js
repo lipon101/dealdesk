@@ -20,6 +20,11 @@
         else who signs in is rejected and signed out immediately).
      6. Set `enabled: true` and commit/push.
 
+   CURRENT STATE: `enabled: true` and the REAL firebaseConfig for the
+   owner's project (gopromotes-admin) are in place. The ONLY remaining
+   required step is to replace the placeholder "you@example.com" in
+   `adminEmails` below with the owner's actual email, then commit/push.
+
    SECURITY NOTE: Firebase web config values are PUBLIC BY DESIGN - they only
    identify your project. Real security comes from Firebase Authentication
    (server-side) plus the adminEmails allow-list below, so committing these
@@ -27,16 +32,22 @@
    ========================================================================= */
 
 window.DD_FIREBASE_CFG = {
-  /* Set to true ONLY after you pasted real values into `config` below and
-     put your email into adminEmails. Until then the admin page keeps the
-     local passphrase gate (clearly labeled as the legacy fallback). */
-  enabled: false,
+  /* ENABLED: real Firebase project values are configured below. The gate on
+     the admin page now uses Firebase Auth (email/password + Google) and the
+     legacy passphrase gate is disabled in Firebase mode. NOTE: you MUST still
+     replace "you@example.com" in adminEmails with your real admin email or
+     every sign-in will be rejected by the allow-list check. */
+  enabled: true,
 
   /* ALLOW-LIST: the only email addresses permitted to enter the panel.
      After a successful Firebase sign-in the email is checked against this
-     list; any other account is signed out immediately. */
+     list; any other account is signed out immediately.
+     !!! ACTION REQUIRED: replace "you@example.com" below with YOUR OWN
+     admin email (the one you created the Firebase user with). Until you do,
+     the allow-list check will REJECT every sign-in (Access denied) and you
+     will be locked out of the panel. Keep it lowercase. */
   adminEmails: [
-    "you@example.com"        /* <-- replace with YOUR email */
+    "you@example.com"        /* <-- REPLACE with YOUR email (required) */
   ],
 
   /* Show the "Continue with Google" button (requires Google enabled in the
@@ -46,11 +57,11 @@ window.DD_FIREBASE_CFG = {
   /* Paste the firebaseConfig from Firebase console here (Project settings ->
      Your apps -> Web app -> SDK setup and configuration -> firebaseConfig). */
   config: {
-    apiKey: "AIzaSy_REPLACE_WITH_YOUR_API_KEY",
-    authDomain: "your-project-id.firebaseapp.com",
-    projectId: "your-project-id",
-    storageBucket: "your-project-id.appspot.com",
-    messagingSenderId: "000000000000",
-    appId: "1:000000000000:web:0000000000000000000000"
+    apiKey: "AIzaSyBiTZKHoQ7Tnxa8ZEDksqjPmO5VtqHQ5tM",
+    authDomain: "gopromotes-admin.firebaseapp.com",
+    projectId: "gopromotes-admin",
+    storageBucket: "gopromotes-admin.firebasestorage.app",
+    messagingSenderId: "269230953055",
+    appId: "1:269230953055:web:187f1bd007c13fe5ba01ea"
   }
 };

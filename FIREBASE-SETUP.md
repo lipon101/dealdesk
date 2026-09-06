@@ -23,16 +23,21 @@ indefinitely for a site of this size (generous quotas; it does not sleep).
 
 ## What you configure
 
-All placeholders live in **`firebase-config.js`** in the site root:
+Your real Firebase project values are already in **`firebase-config.js`**
+(`enabled: true` + the `gopromotes-admin` firebaseConfig). The **only**
+remaining step before sign-in will work is your admin email:
 
 ```js
 window.DD_FIREBASE_CFG = {
-  enabled: false,                 // -> set true only with real values below
-  adminEmails: ["you@example.com"],  // -> YOUR email(s), lowercase
+  enabled: true,                  // already on - gate uses Firebase now
+  adminEmails: ["you@example.com"],  // <-- REPLACE with YOUR email (lowercase)
   googleEnabled: true,            // show "Continue with Google"
-  config: { apiKey: "...", authDomain: "...", projectId: "...", ... }
+  config: { apiKey: "AIzaSyBi...", authDomain: "gopromotes-admin.firebaseapp.com", ... }
 };
 ```
+
+> ⚠️ If `adminEmails` still contains `you@example.com`, the allow-list check
+> rejects **every** sign-in ("Access denied") - you must set your own email.
 
 ## Step-by-step (free, ~10 minutes)
 
