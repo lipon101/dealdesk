@@ -1,9 +1,9 @@
 /* =========================================================================
-   DealDesk — admin-config.js   (PRIVATE — see README → Security model)
+   GoPromotes — admin-config.js   (PRIVATE — see README → Security model)
    -------------------------------------------------------------------------
    Holds the PBKDF2 credential verifier used by the admin login gate.
 
-   ▶ DEFAULT PASSPHRASE (working):  DealDesk#Ridge7!Cipher
+   ▶ DEFAULT PASSPHRASE (working):  GoPromotes#Ridge7!Cipher
      Log in with it now, then change it to your own (steps below).
 
    HOW TO CHANGE THE PASSPHRASE:
@@ -31,9 +31,9 @@
 
 window.DD_ADMIN_CFG = {
   /* PBKDF2-SHA256 verifier (hex). Change these three values together. */
-  salt: "4445b522c8cdfe49efb6c53875b1d6a2",
+  salt: "9f5b7f7149ccc5fe0f8f2cf2453a26ae",
   iterations: 310000,
-  hash: "31a87cf0a96ab4b81011888130339059f3385d98d2c387c409fc19bd45684b72",
+  hash: "b1740c47fd070f85e5ffd5931c255e3e6224b60752e25486f12c64861275e4db",
 
   /* Session token lives in sessionStorage under this key (cleared when the
      tab closes — never localStorage, so it cannot persist after logout). */

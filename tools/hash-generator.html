@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DealDesk — Passphrase Hash Generator (admin tool)</title>
+<title>GoPromotes — Passphrase Hash Generator (admin tool)</title>
 <meta name="robots" content="noindex, nofollow">
 <style>
   :root { --green:#0a5a38; --gold:#e8a33d; --ink:#1c2430; --bg:#f5f7f5; --line:#e3e8e4; }
@@ -34,7 +34,7 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="logo"><span class="mark">DD</span> DealDesk <span style="font-weight:400;color:#5b6672;font-size:14px">· admin tool</span></div>
+  <div class="logo"><span class="mark">GP</span> GoPromotes <span style="font-weight:400;color:#5b6672;font-size:14px">· admin tool</span></div>
   <h1>Passphrase hash generator</h1>
   <p class="sub">Create the PBKDF2-SHA256 salt + hash for your admin passphrase — 100% in your browser (Web Crypto), nothing is sent anywhere.</p>
 
@@ -89,7 +89,7 @@
   document.getElementById("rand").addEventListener("click", function () {
     var w = ["Maple","Willow","Cobalt","Falcon","Ridge","Summit","Quartz","Ember","Cedar","Nova"];
     var n = w[Math.floor(Math.random()*w.length)] + Math.floor(Math.random()*90+10) + "!" + w[Math.floor(Math.random()*w.length)];
-    passEl.value = "DealDesk#" + n;
+    passEl.value = "GoPromotes#" + n;
     passEl.focus();
   });
 

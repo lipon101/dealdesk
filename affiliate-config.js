@@ -1,5 +1,5 @@
 /* =========================================================================
-   DealDesk — affiliate-link override runtime
+   GoPromotes — affiliate-link override runtime
    -------------------------------------------------------------------------
    Every article loads this file. On load it:
      1. reads local overrides (localStorage — written by the admin panel),

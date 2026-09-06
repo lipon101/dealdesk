@@ -1,4 +1,4 @@
-# DealDesk — GitHub Pages deployment guide
+# GoPromotes — GitHub Pages deployment guide
 
 This folder is the **ready-to-push static package**. It contains everything the
 live site needs and nothing else:
@@ -25,7 +25,7 @@ editorial template).
 
 git init
 git add .
-git commit -m "DealDesk static site — initial production deploy"
+git commit -m "GoPromotes static site — initial production deploy"
 
 # Create an empty repo on github.com first (no README/gitignore),
 # then connect it:
@@ -60,7 +60,7 @@ git push -u origin main
 
 ## 4. Pre-launch checklist (do these BEFORE going public)
 
-- [ ] Replace every `https://dealdesk.example.com/...` with your real domain
+- [ ] Replace every `https://gopromotes.com/...` with your real domain
       in: all HTML `rel="canonical"`, `robots.txt` (`Sitemap:` line) and
       `sitemap.xml` (all `<loc>` entries).
 - [ ] Change the admin passphrase (site README §4) and confirm the new hash is
@@ -85,5 +85,6 @@ GitHub Pages redeploys automatically from `main` — no build step needed.
 
 ---
 
-*Full documentation (security model, Worker backend, AdSense, analytics,
-adding new posts) lives in the parent `documents/appsumo-blog-site_v8/README.md`.*
+*Site documentation (architecture, security model, Worker backend, AdSense,
+analytics, adding new posts) is maintained in the project workspace at
+`documents/appsumo-blog-site_v11/README.md`.*

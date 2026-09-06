@@ -1,5 +1,5 @@
 /* =========================================================================
-   DealDesk — admin.js  (hidden control panel logic)
+   GoPromotes — admin.js  (hidden control panel logic)
    -------------------------------------------------------------------------
    Single-page app behind the login gate. Two auth modes:
 

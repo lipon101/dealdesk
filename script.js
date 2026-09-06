@@ -1,4 +1,4 @@
-/* DealDesk — static promo-blog site JS
+/* GoPromotes — static promo-blog site JS
    Nav toggle · sticky header · scrollspy TOC · reveal-on-scroll ·
    countdown demo fill · category page param handling.
    No external calls. Everything here is demo/placeholder behavior.
@@ -145,7 +145,7 @@
     var meta = {
       "all": {
         label: "All reviews",
-        desc: "Every DealDesk guide, organized by category. Each review is based on hands-on testing with deal terms verified against the official AppSumo product page on the day of publication."
+        desc: "Every GoPromotes guide, organized by category. Each review is based on hands-on testing with deal terms verified against the official AppSumo product page on the day of publication."
       },
       "marketing-sales-leads": {
         label: "Marketing & Sales Leads",
@@ -188,7 +188,7 @@
     });
     if (docTitle) docTitle.textContent = info.label;
     if (docDesc) docDesc.textContent = info.desc;
-    document.title = info.label + " \u2014 DealDesk";
+    document.title = info.label + " \u2014 GoPromotes";
     if (cards.length) {
       cards.forEach(function (c) {
         var show = active === "all" || c.getAttribute("data-deal-cat") === active;

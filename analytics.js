@@ -1,5 +1,5 @@
 /* =========================================================================
-   DealDesk — analytics module (local-first, backend-capable)
+   GoPromotes — analytics module (local-first, backend-capable)
    -------------------------------------------------------------------------
    Records page views + affiliate clicks. Two layers:
 

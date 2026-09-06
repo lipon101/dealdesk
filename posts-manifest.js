@@ -1,5 +1,5 @@
 /* =========================================================================
-   DealDesk — posts manifest (single source of truth for site + admin panel)
+   GoPromotes — posts manifest (single source of truth for site + admin panel)
    -------------------------------------------------------------------------
    One entry per published review. The admin panel uses this list for the
    stats dashboard and the affiliate-link manager. When you publish a new
