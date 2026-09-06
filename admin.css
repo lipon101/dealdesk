@@ -91,7 +91,8 @@ button { font-family: inherit; cursor: pointer; }
 
 .gate-card label { display: block; text-align: left; font-size: .8rem; font-weight: 600; color: var(--ink-soft); margin-bottom: 6px; }
 
-.gate-card input[type=password] {
+.gate-card input[type=password],
+.gate-card input[type=email] {
   width: 100%;
   padding: 12px 14px;
   border: 1.5px solid var(--line);
@@ -104,7 +105,8 @@ button { font-family: inherit; cursor: pointer; }
   transition: border-color .15s;
   margin-bottom: 14px;
 }
-.gate-card input[type=password]:focus { border-color: var(--green); background: #fff; }
+.gate-card input[type=password]:focus,
+.gate-card input[type=email]:focus { border-color: var(--green); background: #fff; }
 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -135,6 +137,14 @@ button { font-family: inherit; cursor: pointer; }
 
 .gate-hint { margin-top: 18px; font-size: .74rem; color: var(--ink-faint); line-height: 1.5; }
 .gate-hint code { background: var(--paper-2); padding: 1px 5px; border-radius: 4px; }
+
+.or-divider { display: flex; align-items: center; gap: 12px; margin: 18px 0 14px; color: var(--ink-faint); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
+.or-divider::before, .or-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.btn-google { background: #fff; color: #3c4043; border: 1.5px solid var(--line); width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-top: 2px; }
+.btn-google:hover { background: #f7f8fa; border-color: #cfd3d8; }
+.btn-google:disabled { opacity: .6; cursor: not-allowed; }
+#fbAuth input { margin-bottom: 14px; }
+#fbAuth input[type=email] { margin-bottom: 16px; }
 
 /* ================= APP SHELL ================= */
 #app { display: flex; min-height: 100vh; }

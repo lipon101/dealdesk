@@ -67,7 +67,9 @@ wrangler kv namespace create GP_KV
 cd worker   # run the remaining commands from the worker/ folder
 
 # 3) Set the secret passphrase verifier — same PBKDF2 values as admin-config.js
-#    (generate fresh ones with tools/hash-generator.html if you prefer):
+#    (generate fresh ones with the node one-liner in the header of
+#     admin-config.js, or in the panel: Settings -> Security ->
+#     "change admin passphrase"):
 wrangler secret put ADMIN_SALT     # hex salt, 32 hex chars (16 bytes)
 wrangler secret put ADMIN_HASH     # hex PBKDF2-SHA256 hash (64 hex chars)
 wrangler secret put ADMIN_ITER     # 600000
@@ -81,8 +83,9 @@ wrangler deploy
 
 ### 2.3 Connect the site to the Worker
 
-1. Open your admin panel:
-   `https://gopromotes.com/ca1726777db73e40db30975d6b115f9b3453.html`
+1. Open your admin panel (secret URL — see your latest report; it is not
+   linked anywhere and robots.txt disallows it):
+   `https://gopromotes.com/a33a2d1d4139c87941145395f63ab78d62ef645ee524d5a6.html`
 2. **Settings → Backend API** → paste your Worker URL
    (`https://gopromotes-backend.<your-subdomain>.workers.dev`) → **Save & test**
    (it calls `/api/health`).

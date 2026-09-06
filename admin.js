@@ -1,9 +1,17 @@
 /* =========================================================================
    GoPromotes — admin.js  (hidden control panel logic)
    -------------------------------------------------------------------------
-   Single-page app behind the login gate. Two auth modes:
+   Single-page app behind the login gate. Auth modes:
 
-     BACKEND MODE (recommended): when a Cloudflare Worker backend URL is
+     FIREBASE MODE (recommended - REAL security): when firebase-config.js is
+     enabled with real project values, the gate signs in with Firebase Auth
+     (email/password or Google). Identity is verified SERVER-SIDE by Google;
+     the signed-in email must match the adminEmails allow-list. There is no
+     secret in the source that can be stolen or bypassed, so a PUBLIC repo
+     cannot be used to forge access or swap affiliate links. See
+     FIREBASE-SETUP.md.
+
+     BACKEND MODE: when a Cloudflare Worker backend URL is
      configured (Settings → Backend API → saved to localStorage under
      `dd_backend_url`, or hardcoded in backendUrl below), the passphrase is
      POSTed to the Worker (/api/login). The Worker verifies PBKDF2-SHA256
@@ -136,6 +144,7 @@
         fetch(normUrl(backendUrl()) + "/api/session", { method: "DELETE", headers: { "Authorization": "Bearer " + tok } })
           .catch(function () {});
       }
+      if (window.__gpFb) { window.__gpFb.ns.signOut(window.__gpFb.auth).catch(function () {}); }
     } catch (e) {}
   }
 
@@ -152,6 +161,108 @@
           return { status: r.status, data: data };
         });
       });
+  }
+
+  /* ---------- Firebase Auth (primary when configured) ---------- */
+  function fbCfg() { return window.DD_FIREBASE_CFG || null; }
+  function fbEnabled() {
+    var c = fbCfg();
+    return !!(c && c.enabled === true && c.config && c.config.apiKey &&
+              !/REPLACE/i.test(c.config.apiKey) && !/your-project/i.test(c.config.projectId || ""));
+  }
+  function fbIsAllowed(email) {
+    var c = fbCfg(); var list = (c && c.adminEmails) || [];
+    email = String(email || "").toLowerCase().trim();
+    for (var i = 0; i < list.length; i++) {
+      if (String(list[i] || "").toLowerCase().trim() === email) return true;
+    }
+    return false;
+  }
+  var FB_MODULES_URL = "https://www.gstatic.com/firebasejs/10.12.2/";
+  function fbLoad() {
+    if (fbLoad._p) return fbLoad._p;
+    fbLoad._p = Promise.all([
+      import(FB_MODULES_URL + "firebase-app.js"),
+      import(FB_MODULES_URL + "firebase-auth.js")
+    ]).then(function (m) { return { app: m[0], auth: m[1] }; });
+    return fbLoad._p;
+  }
+  function bootFirebase() {
+    var c = fbCfg();
+    $("#fbAuth").classList.remove("hidden");
+    $("#legacyAuth").classList.add("hidden");
+    $("#gate").classList.remove("hidden");
+    $("#app").classList.add("hidden");
+    /* Hide the Google option + "or" divider when googleEnabled is false. */
+    if (!(c && c.googleEnabled)) {
+      var gb = $("#fbGoogleBtn"); if (gb) gb.style.display = "none";
+      var or = $("#fbOr"); if (or) or.style.display = "none";
+    }
+    gateMessage("Checking secure sign-in…", true);
+    fbLoad().then(function (mods) {
+      var app = mods.app.initializeApp(c.config, "gopromotes-admin");
+      var auth = mods.auth.getAuth(app);
+      window.__gpFb = { ns: mods.auth, auth: auth };
+      auth.onAuthStateChanged(function (user) {
+        if (user && fbIsAllowed(user.email)) {
+          resetAttempts();
+          try { sessionStorage.setItem(CFG.sessionKey, "firebase"); } catch (e) {}
+          enterApp();
+        } else if (user) {
+          mods.auth.signOut(auth).catch(function () {});
+          gateMessage("Access denied: " + esc(user.email || "this account") + " is not on the admin allow-list.");
+        } else {
+          try { sessionStorage.removeItem(CFG.sessionKey); } catch (e) {}
+          var err = $("#gateError");
+          if (err) err.className = "gate-error";
+        }
+      });
+      bindFirebase(mods, auth);
+    }).catch(function (err) {
+      gateMessage("Firebase could not load: " + esc((err && err.message) || err) + " — check firebase-config.js, then reload.");
+      /* Emergency fallback so the owner is never locked out: show the
+         legacy passphrase gate if Firebase fails (wrong config / offline). */
+      $("#legacyAuth").classList.remove("hidden");
+      $("#fbAuth").classList.add("hidden");
+    });
+  }
+  function bindFirebase(mods, auth) {
+    var loginBtn = $("#fbLoginBtn"), googleBtn = $("#fbGoogleBtn"), passIn = $("#fbPass");
+    function attempt(p) {
+      if (loginBtn) loginBtn.disabled = true;
+      if (googleBtn) googleBtn.disabled = true;
+      gateMessage("Signing in…", true);
+      p.then(function (cred) {
+        var u = cred.user;
+        if (!fbIsAllowed(u.email)) {
+          mods.auth.signOut(auth).catch(function () {});
+          gateMessage("Access denied: " + esc(u.email || "this account") + " is not on the admin allow-list.");
+        } else {
+          resetAttempts();
+          try { sessionStorage.setItem(CFG.sessionKey, "firebase"); } catch (e) {}
+          enterApp();
+        }
+      }).catch(function (err) {
+        if (loginBtn) loginBtn.disabled = false;
+        if (googleBtn) googleBtn.disabled = false;
+        var msg = (err && err.message) || String(err);
+        if (err && err.code === "auth/invalid-credential") msg = "Incorrect email or password.";
+        else if (err && err.code === "auth/user-not-found") msg = "No account found with that email.";
+        else if (err && err.code === "auth/popup-blocked") msg = "Google sign-in popup was blocked — allow popups for this site and try again.";
+        gateMessage(msg);
+      });
+    }
+    if (loginBtn) loginBtn.addEventListener("click", function () {
+      var email = $("#fbEmail").value.trim(), pass = $("#fbPass").value;
+      if (!email || !pass) { gateMessage("Enter your email and password."); return; }
+      attempt(mods.auth.signInWithEmailAndPassword(auth, email, pass));
+    });
+    if (passIn) passIn.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && loginBtn) { e.preventDefault(); loginBtn.click(); }
+    });
+    if (googleBtn && mods.auth.GoogleAuthProvider) googleBtn.addEventListener("click", function () {
+      attempt(mods.auth.signInWithPopup(auth, new mods.auth.GoogleAuthProvider()));
+    });
   }
 
   /* ---------- boot: auth gate ---------- */
@@ -650,6 +761,16 @@
         if (window.DealDeskStats) window.DealDeskStats.clear();
         toast("Local stats cleared."); renderDashboard();
       });
+      if (fbEnabled()) {
+        /* Adapt the Security view to Firebase mode. */
+        $$("#view .settings-block p").forEach(function (p, idx) {
+          if (idx === 0) p.innerHTML = "<strong>Firebase Auth enabled:</strong> identity is verified server-side by Google (email/password or Google sign-in). Only the allow-listed admin email(s) in <code>firebase-config.js</code> can enter the panel. The legacy PBKDF2 passphrase fallback is disabled while Firebase is on — remove an email from the Firebase console (Authentication → Users) to revoke access.";
+        });
+        $$("#view .panel").forEach(function (pn) {
+          var h2 = pn.querySelector("h2");
+          if (h2 && /change admin passphrase/i.test(h2.textContent)) pn.style.display = "none";
+        });
+      }
     }
   }
 
@@ -660,6 +781,8 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    bindStatic();
+    if (fbEnabled()) { bootFirebase(); return; }
     if (sessionGet()) {
       enterApp();
     } else {
@@ -668,7 +791,6 @@
       $("#gate").classList.remove("hidden");
       $("#app").classList.add("hidden");
     }
-    bindStatic();
   });
   /* re-bind dynamic controls after each view render */
   var _origShow = show;

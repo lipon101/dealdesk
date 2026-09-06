@@ -22,16 +22,34 @@
 
   <!-- ================= LOGIN GATE ================= -->
   <div id="gate" class="hidden">
-    <form class="gate-card" id="gateForm" autocomplete="off" onsubmit="return false;">
+    <div class="gate-card" id="gateCard">
       <div class="gate-logo"><img src="logo-mark.svg" alt="GoPromotes" width="56" height="56" style="display:block;border-radius:14px"></div>
       <h1>GoPromotes Control</h1>
       <p class="sub">Manage your affiliate site</p>
       <div class="gate-error" id="gateError"></div>
-      <label for="passInput">Passphrase</label>
-      <input type="password" id="passInput" placeholder="Enter your passphrase" autocomplete="off">
-      <button type="submit" class="btn btn-primary" id="loginBtn">Unlock dashboard</button>
-      <p class="gate-hint"><a href="tools/hash-generator.html" target="_blank" rel="noopener">How to change the passphrase &rarr;</a></p>
-    </form>
+
+      <!-- Firebase Auth sign-in (primary; shown when firebase-config.js is enabled) -->
+      <div id="fbAuth" class="hidden">
+        <label for="fbEmail">Email</label>
+        <input type="email" id="fbEmail" placeholder="you@example.com" autocomplete="username" spellcheck="false">
+        <label for="fbPass">Password</label>
+        <input type="password" id="fbPass" placeholder="Your password" autocomplete="current-password">
+        <button type="button" class="btn btn-primary" id="fbLoginBtn">Sign in securely</button>
+        <div class="or-divider" id="fbOr"><span>or</span></div>
+        <button type="button" class="btn btn-google" id="fbGoogleBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.45a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.1 3.57-5.17 3.57-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.91l-3.88-3c-1.08.72-2.45 1.15-4.06 1.15-3.13 0-5.78-2.11-6.72-4.95H1.27v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.28 14.29a7.2 7.2 0 0 1 0-4.58v-3.1H1.27a12 12 0 0 0 0 10.78l4.01-3.1z"/><path fill="#EA4335" d="M12 4.76c1.77 0 3.35.61 4.6 1.8l3.43-3.43A11.98 11.98 0 0 0 1.27 6.61l4.01 3.1C6.22 6.87 8.87 4.76 12 4.76z"/></svg>
+          Continue with Google
+        </button>
+      </div>
+
+      <!-- Passphrase fallback (legacy; shown only until Firebase is configured) -->
+      <div id="legacyAuth">
+        <label for="passInput">Passphrase</label>
+        <input type="password" id="passInput" placeholder="Enter your passphrase" autocomplete="off">
+        <button type="submit" class="btn btn-primary" id="loginBtn">Unlock dashboard</button>
+        <p class="gate-hint">Legacy fallback. Configure Firebase Auth (see <code>FIREBASE-SETUP.md</code>) for server-side sign-in.</p>
+      </div>
+    </div>
   </div>
 
   <!-- ================= APP ================= -->
@@ -71,6 +89,7 @@
   <!-- scripts (admin-config.js is NOT loaded by any public page) -->
   <script src="posts-manifest.js"></script>
   <script src="admin-config.js"></script>
+  <script src="firebase-config.js"></script>
   <script src="analytics.js"></script>
   <script src="affiliate-config.js"></script>
   <script src="admin.js"></script>

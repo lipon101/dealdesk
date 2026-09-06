@@ -1,7 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /ca1726777db73e40db30975d6b115f9b3453.html
+Disallow: /a33a2d1d4139c87941145395f63ab78d62ef645ee524d5a6.html
 Disallow: /post-template.html
-Disallow: /tools/
 
 Sitemap: https://gopromotes.com/sitemap.xml

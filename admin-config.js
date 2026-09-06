@@ -8,19 +8,25 @@
      the owner privately. It is NOT written in any file here. If you are a
      visitor, stop — you cannot log in.
 
-   HOW TO CHANGE THE PASSPHRASE:
+   WHEN FIREBASE IS ENABLED (firebase-config.js → enabled:true) this PBKDF2
+   verifier is IGNORED: the gate uses Firebase Auth instead (server-side
+   identity, no verifier in this repo to steal). Keep this file only as the
+   no-Firebase fallback. See FIREBASE-SETUP.md.
+
+   HOW TO CHANGE THE PASSPHRASE (fallback mode only):
      1. Pick a strong passphrase (16+ chars, mixed case + digits + symbols).
      2. Generate a fresh salt + hash with 600,000 iterations:
           node -e "const c=require('crypto');const s=c.randomBytes(16).toString('hex');
                    console.log(JSON.stringify({salt:s,iter:600000,
                      hash:c.pbkdf2Sync('YOUR_NEW_PASSPHRASE', s, 600000, 32, 'sha256').toString('hex')}))"
-        (or use tools/hash-generator.html — it now defaults to 600,000 too)
+        (or use the in-panel flow: log in, Settings → Security →
+         "change admin passphrase")
      3. Paste the three values below (salt, iterations, hash) and commit.
      NEVER store the plain passphrase here.
      NOTE — salt convention: the hash is derived with the salt passed as a
      UTF-8 STRING (the raw hex characters), i.e. pbkdf2Sync(pass, s, ...) with
      s a string — NOT hex-decoded bytes. The login gate (admin.js), the
-     change-passphrase flow, hash-generator.html and the Worker all use this
+     change-passphrase flow and the Worker all use this
      same convention; keep it when regenerating.
 
    WHY PBKDF2: Web Crypto API (window.crypto.subtle) implements PBKDF2 in

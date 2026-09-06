@@ -10,7 +10,8 @@ live site needs and nothing else:
   plaintext passphrase; see the site README §4)
 - `images/` — all self-hosted product images
 - `robots.txt`, `sitemap.xml`, `favicon.svg`
-- `tools/hash-generator.html` — browser-based passphrase hasher (noindex)
+- `firebase-config.js` — placeholder Firebase Auth config (disabled until
+  you fill it in — see FIREBASE-SETUP.md)
 
 Not included on purpose: the `worker/` backend source (deploy that to
 Cloudflare separately — see site README §6) and `post-template.html` (internal
@@ -85,6 +86,6 @@ GitHub Pages redeploys automatically from `main` — no build step needed.
 
 ---
 
-*Site documentation (architecture, security model, Worker backend, AdSense,
-analytics, adding new posts) is maintained in the project workspace at
-`documents/appsumo-blog-site_v11/README.md`.*
+*Site documentation (architecture, security model, Firebase Auth, Worker
+backend, AdSense, analytics, adding new posts) is maintained in the project
+workspace at `documents/appsumo-blog-site_v16/README.md`.*

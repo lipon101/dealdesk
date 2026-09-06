@@ -69,7 +69,7 @@
     var slug = path.replace(/\.html?$/i, "").replace(/-review$/i, "");
     return slug === "index" || slug === "category" || slug === "about" ||
            slug === "affiliate-disclosure" || slug === "post-template" ||
-           slug === "ca1726777db73e40db30975d6b115f9b3453" ? null : slug;
+           slug === "a33a2d1d4139c87941145395f63ab78d62ef645ee524d5a6" ? null : slug;
   }
 
   /* ---------- page view (once per slug per calendar day per browser) ---- */
