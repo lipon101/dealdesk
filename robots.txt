@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /ca1726777db73e40db30975d6b115f9b3453.html
+Disallow: /tools/
+
+Sitemap: https://dealdesk.example.com/sitemap.xml

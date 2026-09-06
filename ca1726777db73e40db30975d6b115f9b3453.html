@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DealDesk — Control</title>
+  <!-- DealDesk control panel — SECRET URL.
+       This page is intentionally NOT linked from any public page, sitemap, or
+       nav. It is reachable only by its direct (secret) URL slug below, and
+       robots.txt disallows it. Bookmark the URL; do not share it. -->
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- ================= LOGIN GATE ================= -->
+  <div id="gate" class="hidden">
+    <form class="gate-card" id="gateForm" autocomplete="off" onsubmit="return false;">
+      <div class="gate-logo">DD</div>
+      <h1>DealDesk Control</h1>
+      <p class="sub">Sign in to manage stats, links &amp; categories</p>
+      <div class="gate-error" id="gateError"></div>
+      <label for="passInput">Passphrase</label>
+      <input type="password" id="passInput" placeholder="Enter your passphrase" autocomplete="off">
+      <button type="submit" class="btn btn-primary" id="loginBtn">Unlock dashboard</button>
+      <p class="gate-hint">PBKDF2-SHA256 verified in your browser with 310,000 iterations.<br>Repeated failures trigger an automatic lockout with backoff.</p>
+      <p class="gate-hint" style="margin-top:12px;font-size:12.5px;"><a href="tools/hash-generator.html" target="_blank" rel="noopener">How to change the passphrase &rarr;</a></p>
+    </form>
+  </div>
+
+  <!-- ================= APP ================= -->
+  <div id="app" class="hidden">
+    <aside class="sidebar">
+      <div class="side-logo"><span class="mark">DD</span><span>DealDesk<small>control panel</small></span></div>
+      <nav class="side-nav">
+        <button data-view="dashboard" class="active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-6 4 3 5-8"/></svg>
+          Dashboard &amp; stats
+        </button>
+        <button data-view="links">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+          Affiliate links
+        </button>
+        <button data-view="categories">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7l2 2h7v12H4z"/><path d="M4 9h16"/></svg>
+          Categories
+        </button>
+        <button data-view="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+      </nav>
+      <div class="side-bottom">
+        <a href="index.html" target="_blank" rel="noopener">&#8599; Open public site</a>
+        <button class="logout" id="logoutBtn">Log out</button>
+      </div>
+    </aside>
+    <main class="main">
+      <div id="view"></div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- scripts (admin-config.js is NOT loaded by any public page) -->
+  <script src="posts-manifest.js"></script>
+  <script src="admin-config.js"></script>
+  <script src="analytics.js"></script>
+  <script src="affiliate-config.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

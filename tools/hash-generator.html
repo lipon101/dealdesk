@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DealDesk — Passphrase Hash Generator (admin tool)</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+  :root { --green:#0a5a38; --gold:#e8a33d; --ink:#1c2430; --bg:#f5f7f5; --line:#e3e8e4; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif; background:var(--bg); color:var(--ink); line-height:1.6; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 20px 80px; }
+  .logo { display:inline-flex; align-items:center; gap:10px; font-weight:800; color:var(--green); font-size:20px; }
+  .logo .mark { display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:10px; background:var(--green); color:var(--gold); font-weight:800; }
+  h1 { font-size:28px; margin:26px 0 6px; letter-spacing:-.02em; }
+  .sub { color:#5b6672; margin-top:0; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:16px; padding:26px; margin-top:22px; box-shadow:0 8px 24px rgba(16,40,26,.06); }
+  label { font-weight:600; font-size:14px; display:block; margin-bottom:6px; }
+  input { width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:10px; font-size:15px; }
+  input:focus { outline:2px solid var(--green); border-color:transparent; }
+  .row { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  button { border:0; border-radius:10px; padding:12px 18px; font-size:15px; font-weight:700; cursor:pointer; }
+  .btn-green { background:var(--green); color:#fff; }
+  .btn-green:hover { background:#0d6e46; }
+  .btn-ghost { background:#eef2ef; color:var(--ink); }
+  .btn-ghost:hover { background:#e2e8e4; }
+  .status { margin-top:14px; font-size:14px; min-height:22px; font-weight:600; }
+  .ok { color:#0a7a44; } .err { color:#b42318; }
+  pre { background:#0f1720; color:#d7e2dc; border-radius:10px; padding:16px; overflow-x:auto; font-size:13px; line-height:1.5; margin:10px 0 0; }
+  .hint { font-size:13.5px; color:#5b6672; margin-top:14px; }
+  code { background:#eef2ef; border-radius:4px; padding:1px 5px; font-size:.92em; }
+  .steps { margin:18px 0 0; padding-left:20px; } .steps li { margin-bottom:6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo"><span class="mark">DD</span> DealDesk <span style="font-weight:400;color:#5b6672;font-size:14px">· admin tool</span></div>
+  <h1>Passphrase hash generator</h1>
+  <p class="sub">Create the PBKDF2-SHA256 salt + hash for your admin passphrase — 100% in your browser (Web Crypto), nothing is sent anywhere.</p>
+
+  <div class="card">
+    <label for="pass">Your new passphrase</label>
+    <input type="text" id="pass" placeholder="e.g. Correct-Horse-Battery-Staple!2026" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button class="btn-green" id="gen">Generate hash</button>
+      <button class="btn-ghost" id="rand">Suggest a strong passphrase</button>
+    </div>
+    <div class="status" id="status"></div>
+    <div id="out" style="display:none">
+      <p class="hint" style="margin-bottom:4px">Paste this into <code>admin-config.js</code> (replace <code>salt</code>, <code>iterations</code>, <code>hash</code>), then commit:</p>
+      <pre id="json"></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <strong>How to change the admin passphrase</strong>
+    <ol class="steps">
+      <li>Open the admin panel, log out, then open this page in a new tab.</li>
+      <li>Type (or generate) a strong passphrase — 16+ chars, mixed case, digits and symbols.</li>
+      <li>Click <b>Generate hash</b> and copy the JSON block.</li>
+      <li>Open <code>admin-config.js</code> next to the admin page and replace the three values (<code>salt</code>, <code>iterations</code>, <code>hash</code>).</li>
+      <li>Save, upload to your host, and log in with the new passphrase. <b>Never store the plaintext passphrase in the file.</b></li>
+    </ol>
+    <p class="hint">The same values are used for the Cloudflare Worker secrets (<code>ADMIN_SALT</code>, <code>ADMIN_HASH</code>, <code>ADMIN_ITER</code>) if you deploy the backend — see the README §6.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var ITER = 310000;
+  var enc = new TextEncoder();
+  var statusEl = document.getElementById("status");
+  var outEl = document.getElementById("out");
+  var jsonEl = document.getElementById("json");
+  var passEl = document.getElementById("pass");
+
+  function hex(buf) {
+    return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+      return ("0" + b.toString(16)).slice(-2);
+    }).join("");
+  }
+  function randomHex(n) {
+    var a = new Uint8Array(n);
+    crypto.getRandomValues(a);
+    return hex(a);
+  }
+
+  document.getElementById("rand").addEventListener("click", function () {
+    var w = ["Maple","Willow","Cobalt","Falcon","Ridge","Summit","Quartz","Ember","Cedar","Nova"];
+    var n = w[Math.floor(Math.random()*w.length)] + Math.floor(Math.random()*90+10) + "!" + w[Math.floor(Math.random()*w.length)];
+    passEl.value = "DealDesk#" + n;
+    passEl.focus();
+  });
+
+  document.getElementById("gen").addEventListener("click", async function () {
+    var pass = passEl.value;
+    statusEl.className = "status";
+    outEl.style.display = "none";
+    if (!pass || pass.length < 10) {
+      statusEl.className = "status err";
+      statusEl.textContent = "Use at least 10 characters (16+ recommended).";
+      return;
+    }
+    statusEl.className = "status ok";
+    statusEl.textContent = "Deriving PBKDF2-SHA256 (" + ITER.toLocaleString() + " iterations)…";
+    try {
+      var saltHex = randomHex(16);
+      var saltBytes = new Uint8Array(saltHex.match(/.{2}/g).map(function (h) { return parseInt(h, 16); }));
+      var keyMaterial = await crypto.subtle.importKey("raw", enc.encode(pass), "PBKDF2", false, ["deriveBits"]);
+      var bits = await crypto.subtle.deriveBits(
+        { name: "PBKDF2", salt: saltBytes, iterations: ITER, hash: "SHA-256" },
+        keyMaterial, 256
+      );
+      var hashHex = hex(bits);
+      var block = {
+        salt: saltHex,
+        iterations: ITER,
+        hash: hashHex
+      };
+      jsonEl.textContent = "salt: \"" + saltHex + "\",\niterations: " + ITER + ",\nhash: \"" + hashHex + "\"";
+      statusEl.className = "status ok";
+      statusEl.textContent = "Done — copy the block below into admin-config.js.";
+      outEl.style.display = "block";
+    } catch (e) {
+      statusEl.className = "status err";
+      statusEl.textContent = "Error: " + e.message + " (Web Crypto required — use a modern browser).";
+    }
+  });
+})();
+</script>
+</body>
+</html>
